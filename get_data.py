@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import datetime
 
 #reload(pd)
 
@@ -42,7 +43,7 @@ def get_data(date, attributes):
 
     return output
 
-def evaluate(data, teamA, teamB):
+def evaluate(data, teamA, teamB, store = False):
     teamA_stats = data.loc[teamA]
 
     teamB_stats = data.loc[teamB]
@@ -222,6 +223,14 @@ def evaluate(data, teamA, teamB):
     else:
         print("Neither team has a clear advantage.")
 
+    if store == True:
+        if final_score > 0:
+            return([final_score, teamA])
+        elif final_score < 0:
+            return([-1 * final_score, teamB])
+        else:
+            return([final_score, 'Neither'])
+
 def get_data_nfl(date, attributes):
 
     output = pd.DataFrame({'team': []})
@@ -354,3 +363,123 @@ def get_schedule(week):
 # Nevada > UNLV (3)
 
 #z = pd.read_html('https://www.vegasinsider.com/college-football/scoreboard/', flavor = 'html5lib')
+
+def get_historical_nfl_results(years):
+
+    final = pd.DataFrame({'Year': [], 'Week': [], 'Winner': [], 'Loser': [], 'Home_Team': [], 'Margin_of_Victory': []})
+
+    for year in years:
+        z = pd.read_html('https://www.pro-football-reference.com/years/' + str(year) + '/games.htm', flavor = 'html5lib')[0]
+
+        z.columns = ['Week', 'Day', 'Date', 'Time', 'Winner', 'Location', 'Loser', 'Nothing', 'PtsW', 'PtsL', 'No',
+                     'No2', 'TO2', 'YdsL']
+
+        z = z[['Week', 'Winner', 'Loser', 'Location', 'PtsW', 'PtsL']]
+
+        z = z.replace("New York Jets", "NY Jets Jets")
+        z = z.replace("New York Giants", "NY Giants Giants")
+
+        z = z.replace("Los Angeles Rams", "LA Rams Rams")
+        z = z.replace("Los Angeles Chargers", "LA Chargers Chargers")
+
+        z = z.dropna(subset = ['Winner', 'Loser'])
+
+        z['Winner'] = z['Winner'].apply(lambda x: " ".join(x.split(" ")[:-1]))
+        z['Loser'] = z['Loser'].apply(lambda x: " ".join(x.split(" ")[:-1]))
+
+        z = z.loc[~z['Week'].isin(['Week', 'WildCard', 'Division', 'ConfChamp', 'SuperBowl'])]
+
+        z = z.reset_index(drop = True)
+
+        z['Home_Team'] = np.asarray([z['Loser'][x] if z['Location'][x] == '@'
+                                     else z['Winner'][x] for x in range(len(z['Winner']))])
+
+        z['PtsW'] = z['PtsW'].astype('int32')
+        z['PtsL'] = z['PtsL'].astype('int32')
+        z['Margin_of_Victory'] = z['PtsW'] - z['PtsL']
+
+        z['Week'] = z['Week'].astype('int32')
+
+        z = z[['Week', 'Winner', 'Loser', 'Home_Team', 'Margin_of_Victory']]
+
+        z['Year'] = int(year)
+
+        final = pd.concat([final, z])
+
+        final = final.reset_index(drop = True)
+
+    return(final)
+
+def get_historical_nfl_data(start_dates, start_week, attributes):
+
+    df_list = []
+
+    for start_date in start_dates:
+        date_list = []
+        for x in range(13):
+            original_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+            next_date_to_add = original_date + datetime.timedelta(days = 7 * x)
+            next_date_to_add = next_date_to_add.strftime('%Y-%m-%d')
+            date_list.append(next_date_to_add)
+
+        start_week_go = start_week
+        for date in date_list:
+            print(date)
+            to_concat = get_data_nfl(date, attributes)
+            to_concat['Week'] = start_week_go
+            to_concat['Year'] = date[0:4]
+
+            df_list.append(to_concat)
+
+            start_week_go += 1
+
+    output = pd.concat(df_list)
+
+    output['Week'] = output['Week'].astype('int32')
+    output['Year'] = output['Year'].astype('int32')
+
+    return(output)
+
+stat_history = get_historical_nfl_data(start_dates = ['2015-10-07', '2016-10-05', '2017-10-04', '2018-10-03', '2019-10-02'],
+                                       start_week = 5,
+                                       attributes={'yards-per-pass-attempt': 'desc',
+                                                   'yards-per-rush-attempt': 'desc',
+                                                   'offensive-points-per-game': 'desc',
+                                                   'opponent-yards-per-pass-attempt': 'asc',
+                                                   'opponent-yards-per-rush-attempt': 'asc',
+                                                   'opponent-offensive-points-per-game': 'asc',
+                                                   'turnover-margin-per-game': 'desc',
+                                                   'predictive-by-other': 'desc'}
+                                       )
+
+#history = get_historical_nfl_results([2015, 2016, 2017, 2018, 2019])
+
+#to_eval = history.loc[history['Week'] > 4]
+
+#to_eval['pred_winner'] = 'Neither'
+#to_eval['confidence'] = np.nan
+
+#to_eval = to_eval.replace("St. Louis", "LA Rams")
+#to_eval = to_eval.replace("Oakland", "Las Vegas")
+#to_eval = to_eval.replace("San Diego", "LA Chargers")
+
+#to_eval = to_eval.reset_index(drop = True)
+
+#for row in range(len(to_eval['Home_Team'])):
+#    week_to_locate = to_eval['Week'][row]
+#    year_to_locate = to_eval['Year'][row]
+#    to_eval.loc[row, 'confidence'] = evaluate(stat_history.loc[(stat_history['Year'] == year_to_locate) & (stat_history['Week'] == week_to_locate)],
+#                                        to_eval['Winner'][row], to_eval['Loser'][row], store = True)[0]
+#    to_eval.loc[row, 'pred_winner'] = evaluate(stat_history.loc[(stat_history['Year'] == year_to_locate) & (stat_history['Week'] == week_to_locate)],
+#                                        to_eval['Winner'][row], to_eval['Loser'][row], store = True)[1]
+
+#to_eval['Correct'] = to_eval['Winner'] == to_eval['pred_winner']
+
+#we_were_right = to_eval.loc[to_eval['Correct'] == 1]
+#we_were_right.groupby('confidence')['Margin_of_Victory'].median()
+
+#we_were_wrong = to_eval.loc[to_eval['Correct'] == 0]
+#we_were_wrong.groupby('confidence')['Margin_of_Victory'].summarize()
+
+#we_did_know = to_eval.loc[to_eval['confidence'] > 2]
+#we_did_know.groupby('Year')['Correct'].apply(lambda x: x.sum() / len(x))
