@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ce91077c-fdfd-485b-b02e-c9b5f959c9f8" name="Default Changelist" comment="" />
+    <list default="true" id="ce91077c-fdfd-485b-b02e-c9b5f959c9f8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/BetNCAAF.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/abstract_base_classes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/results.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/results_nfl.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screening_tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/get_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/get_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -26,7 +35,15 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings>
+        <option name="useSoftWraps" value="true" />
+      </console-settings>
+    </option>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -58,24 +75,25 @@
       <screen x="0" y="23" width="1440" height="799" />
     </state>
     <state x="565" y="328" key="Github.ShareDialog/0.23.1440.799@0.23.1440.799" timestamp="1604173590639" />
-    <state x="221" y="62" key="SettingsEditor" timestamp="1604175006190">
+    <state x="221" y="62" key="SettingsEditor" timestamp="1607791893259">
       <screen x="0" y="23" width="1440" height="799" />
     </state>
-    <state x="221" y="62" key="SettingsEditor/0.23.1440.799@0.23.1440.799" timestamp="1604175006190" />
-    <state width="700" height="378" key="XDebugger.FullValuePopup" timestamp="1602968080232">
-      <screen x="0" y="23" width="1440" height="797" />
+    <state x="221" y="62" key="SettingsEditor/0.23.1440.799@0.23.1440.799" timestamp="1607791893259" />
+    <state width="700" height="379" key="XDebugger.FullValuePopup" timestamp="1606430797307">
+      <screen x="0" y="23" width="1440" height="799" />
     </state>
     <state width="700" height="378" key="XDebugger.FullValuePopup/0.23.1440.797@0.23.1440.797" timestamp="1602968080232" />
+    <state width="700" height="379" key="XDebugger.FullValuePopup/0.23.1440.799@0.23.1440.799" timestamp="1606430797307" />
     <state x="296" y="143" width="1200" height="656" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1603551605446">
       <screen x="0" y="23" width="1920" height="979" />
     </state>
     <state x="296" y="143" width="1200" height="656" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.23.1920.979@0.23.1920.979" timestamp="1603551605446" />
-    <state x="-28" y="-1514" key="com.intellij.ide.util.TipDialog" timestamp="1604163430896">
-      <screen x="-1025" y="-2137" width="3840" height="2137" />
+    <state x="374" y="256" key="com.intellij.ide.util.TipDialog" timestamp="1608410220450">
+      <screen x="0" y="23" width="1440" height="799" />
     </state>
     <state x="-28" y="-1514" key="com.intellij.ide.util.TipDialog/-1025.-2137.3840.2137/0.23.1440.799@-1025.-2137.3840.2137" timestamp="1604163430896" />
     <state x="374" y="256" key="com.intellij.ide.util.TipDialog/0.23.1440.797@0.23.1440.797" timestamp="1602965493992" />
-    <state x="374" y="256" key="com.intellij.ide.util.TipDialog/0.23.1440.799@0.23.1440.799" timestamp="1604075509658" />
+    <state x="374" y="256" key="com.intellij.ide.util.TipDialog/0.23.1440.799@0.23.1440.799" timestamp="1608410220450" />
     <state x="499" y="309" key="com.intellij.ide.util.TipDialog/0.23.1920.979@0.23.1920.979" timestamp="1603551421176" />
     <state x="370" y="145" width="700" height="530" key="recent.locations.popup" timestamp="1602966322233">
       <screen x="0" y="23" width="1440" height="797" />

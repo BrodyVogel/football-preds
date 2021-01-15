@@ -1,16 +1,18 @@
 import numpy as np
 import pandas as pd
 import datetime
+import re
+from sklearn import preprocessing
 
 #reload(pd)
 
-def get_data(date, attributes):
+def get_data_ncaaf(date, attributes):
 
     output = pd.DataFrame({'team': []})
     output = output.set_index('team')
 
     for attribute in list(attributes.keys()):
-        if 'predictive' in attribute:
+        if 'by-other' in attribute:
             url = 'https://www.teamrankings.com/college-football/ranking/' + attribute + '?date=' + date
         else:
             url = 'https://www.teamrankings.com/college-football/stat/' + attribute + '?date=' + date
@@ -21,8 +23,13 @@ def get_data(date, attributes):
 
         z.columns = [attribute + '_rank', 'team', attribute]
 
-        if 'predictive' in attribute:
-            z['team'] = [x.split(' (')[0] for x in z['team']]
+        z = z.replace('Miami (OH)', 'Miami_OH')
+        z = z.replace('Miami (FL)', 'Miami_FL')
+
+        if 'by-other' in attribute:
+            z['team'] = ['Miami_OH' if 'Miami (OH)' in x
+                         else 'Miami_FL' if 'Miami (FL' in x
+                         else x.split(' (')[0] for x in z['team']]
 
         z = z.set_index('team')
 
@@ -43,155 +50,458 @@ def get_data(date, attributes):
 
     return output
 
-def evaluate(data, teamA, teamB, store = False):
+def adjust_sos(data, sos_column, magnitude, group_columns = []):
+
+    if group_columns == []:
+        data[sos_column + '_adj_neg'] = data[sos_column].rank(pct=True)
+        data[sos_column + '_adj_pos'] = data[sos_column].rank(pct=True, ascending=False)
+    else:
+        data[sos_column + '_adj_neg'] = data.groupby(group_columns)[sos_column].rank(pct=True)
+        data[sos_column + '_adj_pos'] = data.groupby(group_columns)[sos_column].rank(pct=True, ascending=False)
+
+    data[sos_column + '_adj'] = np.asarray([data[sos_column + '_adj_pos'][x] if data[sos_column + '_adj_pos'][x] > 0.49
+                                        else -1 * data[sos_column + '_adj_neg'][x] for x in range(len(data[sos_column]))])
+
+    data[sos_column + '_adj'] = data[sos_column + '_adj'] * magnitude
+
+    data = data.drop(columns=[sos_column + '_adj_neg', sos_column + '_adj_pos'])
+
+    for col in data.columns:
+        if 'rank' in col and col not in [sos_column, sos_column + '_adj']:
+            data[col] = data[col] - data[sos_column + '_adj']
+
+    return(data)
+
+
+def evaluate_v2(data, teamA, teamB, magnitude=12, factor_policy={}, store=False, verbose=False, spread_target = None,
+                grouping = 'overall'):
     teamA_stats = data.loc[teamA]
 
     teamB_stats = data.loc[teamB]
 
-    final_score = 0
+    ht = 0
+    ht_3s = 0
+    ht_2s = 0
+    ht_1s = 0
+    ht_half = 0
+    at = 0
+    at_3s = 0
+    at_2s = 0
+    at_1s = 0
+    at_half = 0
+
+    for factor in factor_policy.keys():
+
+        if factor_policy[factor]['two_fac'] != None:
+            factor_good = factor_policy[factor]['two_fac'][0]
+            factor_bad = factor_policy[factor]['two_fac'][1]
+
+            teamA_good_fac = teamA_stats[factor_good]
+            teamB_good_fac = teamB_stats[factor_good]
+            teamA_bad_fac = teamA_stats[factor_bad]
+            teamB_bad_fac = teamB_stats[factor_bad]
+
+            teamA_status = teamB_bad_fac - teamA_good_fac
+            teamB_status = teamA_bad_fac - teamB_good_fac
+
+            if factor_policy[factor]["three_points"] != None:
+                if teamA_status > factor_policy[factor]["three_points"][0]:
+                    ht += 3
+                    ht_3s += 1
+                    if verbose == True:
+                        print(teamA + " has a +3 advantage on " + factor)
+                elif teamA_status > factor_policy[factor]["two_points"][0]:
+                    ht += 2
+                    ht_2s += 1
+                    if verbose == True:
+                        print(teamA + " has a +2 advantage on " + factor)
+                elif teamA_status > factor_policy[factor]["one_point"][0]:
+                    ht += 1
+                    ht_1s += 1
+                    if verbose == True:
+                        print(teamA + " has a +1 advantage on " + factor)
+                elif teamA_status > magnitude:
+                    ht += 0.5
+                    ht_half += 1
+                    if verbose == True:
+                        print(teamA + " has a +0.5 advantage on " + factor)
+                else:
+                    ht += 0
+
+                if teamB_status > factor_policy[factor]["three_points"][0]:
+                    at += 3
+                    at_3s += 1
+                    if verbose == True:
+                        print(teamB + " has a +3 advantage on " + factor)
+                elif teamB_status > factor_policy[factor]["two_points"][0]:
+                    at += 2
+                    at_2s += 1
+                    if verbose == True:
+                        print(teamB + " has a +2 advantage on " + factor)
+                elif teamB_status > factor_policy[factor]["one_point"][0]:
+                    at += 1
+                    at_1s += 1
+                    if verbose == True:
+                        print(teamB + " has a +1 advantage on " + factor)
+                elif teamB_status > magnitude:
+                    at += 0.5
+                    at_half += 1
+                    if verbose == True:
+                        print(teamB + " has a +0.5 advantage on " + factor)
+                else:
+                    at += 0
+
+            else:
+                if teamA_status > factor_policy[factor]["two_points"][0]:
+                    ht += 2
+                    ht_2s += 1
+                    if verbose == True:
+                        print(teamA + " has a +2 advantage on " + factor)
+                elif teamA_status > factor_policy[factor]["one_point"][0]:
+                    ht += 1
+                    ht_1s += 1
+                    if verbose == True:
+                        print(teamA + " has a +1 advantage on " + factor)
+                elif teamA_status > magnitude:
+                    ht += 0.5
+                    ht_half += 1
+                    if verbose == True:
+                        print(teamA + " has a +0.5 advantage on " + factor)
+                else:
+                    ht += 0
+
+                if teamB_status > factor_policy[factor]["two_points"][0]:
+                    at += 2
+                    at_2s += 1
+                    if verbose == True:
+                        print(teamB + " has a +2 advantage on " + factor)
+                elif teamB_status > factor_policy[factor]["one_point"][0]:
+                    at += 1
+                    at_1s += 1
+                    if verbose == True:
+                        print(teamB + " has a +1 advantage on " + factor)
+                elif teamB_status > magnitude:
+                    at += 0.5
+                    at_half += 1
+                    if verbose == True:
+                        print(teamB + " has a +0.5 advantage on " + factor)
+                else:
+                    at += 0
+
+        else:
+
+            teamA_status = teamB_stats[factor] - teamA_stats[factor]
+            teamB_status = teamA_stats[factor] - teamB_stats[factor]
+
+            if factor_policy[factor]["three_points"] != None:
+                if teamA_status > factor_policy[factor]["three_points"][0]:
+                    ht += 3
+                    ht_3s += 1
+                    if verbose == True:
+                        print(teamA + " has a +3 advantage on " + factor)
+                elif teamA_status > factor_policy[factor]["two_points"][0]:
+                    ht += 2
+                    ht_2s += 1
+                    if verbose == True:
+                        print(teamA + " has a +2 advantage on " + factor)
+                elif teamA_status > factor_policy[factor]["one_point"][0]:
+                    ht += 1
+                    ht_1s += 1
+                    if verbose == True:
+                        print(teamA + " has a +1 advantage on " + factor)
+                elif teamA_status > magnitude:
+                    ht += 0.5
+                    ht_half += 1
+                    if verbose == True:
+                        print(teamA + " has a +0.5 advantage on " + factor)
+                else:
+                    ht += 0
+
+                if teamB_status > factor_policy[factor]["three_points"][0]:
+                    at += 3
+                    at_3s += 1
+                    if verbose == True:
+                        print(teamB + " has a +3 advantage on " + factor)
+                elif teamB_status > factor_policy[factor]["two_points"][0]:
+                    at += 2
+                    at_2s += 1
+                    if verbose == True:
+                        print(teamB + " has a +2 advantage on " + factor)
+                elif teamB_status > factor_policy[factor]["one_point"][0]:
+                    at += 1
+                    at_1s += 1
+                    if verbose == True:
+                        print(teamB + " has a +1 advantage on " + factor)
+                elif teamB_status > magnitude:
+                    at += 0.5
+                    at_half += 1
+                    if verbose == True:
+                        print(teamB + " has a +0.5 advantage on " + factor)
+                else:
+                    at += 0
+
+            else:
+                if teamA_status > factor_policy[factor]["two_points"][0]:
+                    ht += 2
+                    ht_2s += 1
+                    if verbose == True:
+                        print(teamA + " has a +2 advantage on " + factor)
+                elif teamA_status > factor_policy[factor]["one_point"][0]:
+                    ht += 1
+                    ht_1s += 1
+                    if verbose == True:
+                        print(teamA + " has a +1 advantage on " + factor)
+                elif teamA_status > magnitude:
+                    ht += 0.5
+                    ht_half += 1
+                    if verbose == True:
+                        print(teamA + " has a +0.5 advantage on " + factor)
+                else:
+                    ht += 0
+
+                if teamB_status > factor_policy[factor]["two_points"][0]:
+                    at += 2
+                    at_2s += 1
+                    if verbose == True:
+                        print(teamB + " has a +2 advantage on " + factor)
+                elif teamB_status > factor_policy[factor]["one_point"][0]:
+                    at += 1
+                    at_1s += 1
+                    if verbose == True:
+                        print(teamB + " has a +1 advantage on " + factor)
+                elif teamB_status > magnitude:
+                    at += 0.5
+                    at_half += 1
+                    if verbose == True:
+                        print(teamB + " has a +0.5 advantage on " + factor)
+                else:
+                    at += 0
+
+    if ht > at:
+        print(teamA, " is likely to win, with a score of ", str(ht - at))
+
+    elif ht < at:
+        print(teamB, " is likely to win, with a score of ", str(at - ht))
+
+    else:
+        print("Neither team has a clear advantage.")
+
+    if store == True:
+        if grouping == 'overall':
+            if ht > at:
+                return([ht, at, ht - at, teamA])
+            elif at > ht:
+                return([at, ht, at-ht, teamB])
+            else:
+                return([ht, at, ht-at, 'Neither'])
+
+        elif grouping == 'threes':
+            if ht_3s > at_3s:
+                return ([ht - at, ht_3s - at_3s, ht_2s - at_2s, ht_1s - at_1s, ht_half - at_half, teamA])
+            elif at_3s > ht_3s:
+                return ([at - ht, at_3s - ht_3s, at_2s - ht_2s, at_1s - ht_1s, at_half - ht_half, teamB])
+            else:
+                return ([ht - at, ht_3s - at_3s, ht_2s - at_2s, ht_1s - at_1s, ht_half - at_half, 'Neither'])
+
+        elif grouping == 'twos':
+            if ht_2s > at_2s:
+                return ([ht - at, ht_3s - at_3s, ht_2s - at_2s, ht_1s - at_1s, ht_half - at_half, teamA])
+            elif at_2s > ht_2s:
+                return ([at - ht, at_3s - ht_3s, at_2s - ht_2s, at_1s - ht_1s, at_half - ht_half, teamB])
+            else:
+                return ([ht - at, ht_3s - at_3s, ht_2s - at_2s, ht_1s - at_1s, ht_half - at_half, 'Neither'])
+
+        elif grouping == 'ones':
+            if ht_1s > at_1s:
+                return ([ht - at, ht_3s - at_3s, ht_2s - at_2s, ht_1s - at_1s, ht_half - at_half, teamA])
+            elif at_1s > ht_1s:
+                return ([at - ht, at_3s - ht_3s, at_2s - ht_2s, at_1s - ht_1s, at_half - ht_half, teamB])
+            else:
+                return ([ht - at, ht_3s - at_3s, ht_2s - at_2s, ht_1s - at_1s, ht_half - at_half, 'Neither'])
+
+        elif grouping == 'half':
+            if ht_half > at_half:
+                return ([ht - at, ht_3s - at_3s, ht_2s - at_2s, ht_1s - at_1s, ht_half - at_half, teamA])
+            elif at_half > ht_half:
+                return ([at - ht, at_3s - ht_3s, at_2s - ht_2s, at_1s - ht_1s, at_half - ht_half, teamB])
+            else:
+                return ([ht - at, ht_3s - at_3s, ht_2s - at_2s, ht_1s - at_1s, ht_half - at_half, 'Neither'])
+
+    if spread_target != None:
+        spread_df = spread_target[0]
+        zz = 0
+        if ht > at:
+            diff = ht - at
+        elif at > ht:
+            diff = at - ht
+        else:
+            zz = 1
+            diff = 1
+
+        found = False
+        row = 0
+        while found == False:
+            if zz == 1:
+                found = True
+            if (diff >= spread_df.loc[row, 'min']) and (diff <= spread_df.loc[row, 'max']):
+                print("No-Brainer: " + str(-1 * spread_df.loc[row, '25%']), ", Good Bet: " + str(-1 * spread_df.loc[row, '40%']),
+                      ", Chance: " + str(-1 * spread_df.loc[row, '50%']))
+                print("No-Brainer Fade: " + str(-1 * spread_df.loc[row, '90%']), "Good Fade: " + str(-1 * spread_df.loc[row, '75%']))
+                found = True
+            else:
+                row += 1
+
+
+def evaluate(data, teamA, teamB, size, store = False):
+    teamA_stats = data.loc[teamA]
+
+    teamB_stats = data.loc[teamB]
+
+    ht = 0
+    at = 0
 
     # Passing Offense - Home Team
-    if teamA_stats['yards-per-pass-attempt_rank'] + 10 < teamB_stats['opponent-yards-per-pass-attempt_rank']:
-        print(teamA, "has an advantage passing against the ", teamB, " defense. (YPP/Rank: ",
+    if teamA_stats['yards-per-pass-attempt_rank'] + size < teamB_stats['opponent-yards-per-pass-attempt_rank']:
+        print(teamA, " has an advantage passing against the ", teamB, " defense. (YPP/Rank: ",
               str(teamA_stats['yards-per-pass-attempt']), '/', str(teamA_stats['yards-per-pass-attempt_rank']),
               " vs Defense's YPP/Rank: ", str(teamB_stats['opponent-yards-per-pass-attempt']),
               str(teamB_stats['opponent-yards-per-pass-attempt_rank']))
 
-        final_score += 1
+        ht += 1
 
-    elif teamB_stats['opponent-yards-per-pass-attempt_rank'] + 10 < teamA_stats['yards-per-pass-attempt_rank']:
-        print(teamB, "has an advantage DEFENDING the pass against the ", teamA, " offense. (Defense YPP/Rank: ",
+    elif teamB_stats['opponent-yards-per-pass-attempt_rank'] + size < teamA_stats['yards-per-pass-attempt_rank']:
+        print(teamB, " has an advantage DEFENDING the pass against the ", teamA, " offense. (Defense YPP/Rank: ",
               str(teamB_stats['opponent-yards-per-pass-attempt']), '/',
               str(teamB_stats['opponent-yards-per-pass-attempt_rank']), " vs Opponent YPP/Rank: ",
               str(teamA_stats['yards-per-pass-attempt']), str(teamA_stats['yards-per-pass-attempt_rank']))
 
-        final_score -=1
+        at +=1
 
     else:
         a = 0
         #print("Neither team has an advantage when", teamA, "passes.")
 
     # Passing Offense - Away Team
-    if teamB_stats['yards-per-pass-attempt_rank'] + 10 < teamA_stats['opponent-yards-per-pass-attempt_rank']:
-        print(teamB, "has an advantage passing against the ", teamA, " defense. (YPP/Rank: ",
+    if teamB_stats['yards-per-pass-attempt_rank'] + size < teamA_stats['opponent-yards-per-pass-attempt_rank']:
+        print(teamB, " has an advantage passing against the ", teamA, " defense. (YPP/Rank: ",
               str(teamB_stats['yards-per-pass-attempt']), '/', str(teamB_stats['yards-per-pass-attempt_rank']),
               " vs Defense's YPP/Rank: ", str(teamA_stats['opponent-yards-per-pass-attempt']),
               str(teamA_stats['opponent-yards-per-pass-attempt_rank']))
 
-        final_score -= 1
+        at += 1
 
-    elif teamA_stats['opponent-yards-per-pass-attempt_rank'] + 10 < teamB_stats['yards-per-pass-attempt_rank']:
-        print(teamA, "has an advantage DEFENDING the pass against the ", teamB, " offense. (Defense YPP/Rank: ",
+    elif teamA_stats['opponent-yards-per-pass-attempt_rank'] + size < teamB_stats['yards-per-pass-attempt_rank']:
+        print(teamA, " has an advantage DEFENDING the pass against the ", teamB, " offense. (Defense YPP/Rank: ",
               str(teamA_stats['opponent-yards-per-pass-attempt']), '/',
               str(teamA_stats['opponent-yards-per-pass-attempt_rank']), " vs Opponent YPP/Rank: ",
               str(teamB_stats['yards-per-pass-attempt']), str(teamB_stats['yards-per-pass-attempt_rank']))
 
-        final_score += 1
+        ht += 1
 
     else:
         a = 0
         #print("Neither team has an advantage when", teamB, "passes.")
         
     # Rushing Offense - Home Team
-    if teamA_stats['yards-per-rush-attempt_rank'] + 10 < teamB_stats['opponent-yards-per-rush-attempt_rank']:
-        print(teamA, "has an advantage rushing against the ", teamB, " defense. (YPP/Rank: ",
+    if teamA_stats['yards-per-rush-attempt_rank'] + size < teamB_stats['opponent-yards-per-rush-attempt_rank']:
+        print(teamA, " has an advantage rushing against the ", teamB, " defense. (YPP/Rank: ",
               str(teamA_stats['yards-per-rush-attempt']), '/', str(teamA_stats['yards-per-rush-attempt_rank']),
               " vs Defense's YPP/Rank: ", str(teamB_stats['opponent-yards-per-rush-attempt']),
               str(teamB_stats['opponent-yards-per-rush-attempt_rank']))
 
-        final_score += 1
+        ht += 1
 
-    elif teamB_stats['opponent-yards-per-rush-attempt_rank'] + 10 < teamA_stats['yards-per-rush-attempt_rank']:
-        print(teamB, "has an advantage DEFENDING the rush against the ", teamA, " offense. (Defense YPP/Rank: ",
+    elif teamB_stats['opponent-yards-per-rush-attempt_rank'] + size < teamA_stats['yards-per-rush-attempt_rank']:
+        print(teamB, " has an advantage DEFENDING the rush against the ", teamA, " offense. (Defense YPP/Rank: ",
               str(teamB_stats['opponent-yards-per-rush-attempt']), '/',
               str(teamB_stats['opponent-yards-per-rush-attempt_rank']), " vs Opponent YPP/Rank: ",
               str(teamA_stats['yards-per-rush-attempt']), str(teamA_stats['yards-per-rush-attempt_rank']))
 
-        final_score -=1
+        at +=1
 
     else:
         a = 0
         #print("Neither team has an advantage when", teamA, "rushes.")
 
     # Rushing Offense - Away Team
-    if teamB_stats['yards-per-rush-attempt_rank'] + 10 < teamA_stats['opponent-yards-per-rush-attempt_rank']:
-        print(teamB, "has an advantage rushing against the ", teamA, " defense. (YPP/Rank: ",
+    if teamB_stats['yards-per-rush-attempt_rank'] + size < teamA_stats['opponent-yards-per-rush-attempt_rank']:
+        print(teamB, " has an advantage rushing against the ", teamA, " defense. (YPP/Rank: ",
               str(teamB_stats['yards-per-rush-attempt']), '/', str(teamB_stats['yards-per-rush-attempt_rank']),
               " vs Defense's YPP/Rank: ", str(teamA_stats['opponent-yards-per-rush-attempt']),
               str(teamA_stats['opponent-yards-per-rush-attempt_rank']))
 
-        final_score -= 1
+        at += 1
 
-    elif teamA_stats['opponent-yards-per-rush-attempt_rank'] + 10 < teamB_stats['yards-per-rush-attempt_rank']:
-        print(teamA, "has an advantage DEFENDING the rush against the ", teamB, " offense. (Defense YPP/Rank: ",
+    elif teamA_stats['opponent-yards-per-rush-attempt_rank'] + size < teamB_stats['yards-per-rush-attempt_rank']:
+        print(teamA, " has an advantage DEFENDING the rush against the ", teamB, " offense. (Defense YPP/Rank: ",
               str(teamA_stats['opponent-yards-per-rush-attempt']), '/',
               str(teamA_stats['opponent-yards-per-rush-attempt_rank']), " vs Opponent YPP/Rank: ",
               str(teamB_stats['yards-per-rush-attempt']), str(teamB_stats['yards-per-rush-attempt_rank']))
 
-        final_score += 1
+        ht += 1
 
     else:
         a = 0
         #print("Neither team has an advantage when", teamB, "rushes.")
 
     # Total Offense - Home Team
-    if teamA_stats['offensive-points-per-game_rank'] + 10 < teamB_stats['opponent-offensive-points-per-game_rank']:
-        print(teamA, "has an overall offensive advantage against the ", teamB, " defense. (OPPG/Rank: ",
+    if teamA_stats['offensive-points-per-game_rank'] + size < teamB_stats['opponent-offensive-points-per-game_rank']:
+        print(teamA, " has an overall offensive advantage against the ", teamB, " defense. (OPPG/Rank: ",
               str(teamA_stats['offensive-points-per-game']), '/', str(teamA_stats['offensive-points-per-game_rank']),
               " vs Defense's OPPG/Rank: ", str(teamB_stats['opponent-offensive-points-per-game']),
               str(teamB_stats['opponent-offensive-points-per-game_rank']))
 
-        final_score += 1
+        ht += 1
 
-    elif teamB_stats['opponent-offensive-points-per-game_rank'] + 10 < teamA_stats['offensive-points-per-game_rank']:
-        print(teamB, "has an overall advantage DEFENDING against the ", teamA, " offense. (Defense OPPG/Rank: ",
+    elif teamB_stats['opponent-offensive-points-per-game_rank'] + size < teamA_stats['offensive-points-per-game_rank']:
+        print(teamB, " has an overall advantage DEFENDING against the ", teamA, " offense. (Defense OPPG/Rank: ",
               str(teamB_stats['opponent-offensive-points-per-game']), '/',
               str(teamB_stats['opponent-offensive-points-per-game_rank']), " vs Opponent OPPG/Rank: ",
               str(teamA_stats['offensive-points-per-game']), str(teamA_stats['offensive-points-per-game_rank']))
 
-        final_score -=1
+        at +=1
 
     else:
         a = 0
         #print("Neither team has an overall advantage when", teamA, "is on offense.")
 
     # Total Offense - Away Team
-    if teamB_stats['offensive-points-per-game_rank'] + 10 < teamA_stats['opponent-offensive-points-per-game_rank']:
-        print(teamB, "has an overall offensive advantage against the ", teamA, " defense. (OPPG/Rank: ",
+    if teamB_stats['offensive-points-per-game_rank'] + size < teamA_stats['opponent-offensive-points-per-game_rank']:
+        print(teamB, " has an overall offensive advantage against the ", teamA, " defense. (OPPG/Rank: ",
               str(teamB_stats['offensive-points-per-game']), '/', str(teamB_stats['offensive-points-per-game_rank']),
               " vs Defense's OPPG/Rank: ", str(teamA_stats['opponent-offensive-points-per-game']),
               str(teamA_stats['opponent-offensive-points-per-game_rank']))
 
-        final_score -= 1
+        at += 1
 
-    elif teamA_stats['opponent-offensive-points-per-game_rank'] + 10 < teamB_stats['offensive-points-per-game_rank']:
-        print(teamA, "has an overall advantage DEFENDING against the ", teamB, " offense. (Defense OPPG/Rank: ",
+    elif teamA_stats['opponent-offensive-points-per-game_rank'] + size < teamB_stats['offensive-points-per-game_rank']:
+        print(teamA, " has an overall advantage DEFENDING against the ", teamB, " offense. (Defense OPPG/Rank: ",
               str(teamA_stats['opponent-offensive-points-per-game']), '/',
               str(teamA_stats['opponent-offensive-points-per-game_rank']), " vs Opponent OPPG/Rank: ",
               str(teamB_stats['offensive-points-per-game']), str(teamB_stats['offensive-points-per-game_rank']))
 
-        final_score += 1
+        ht += 1
 
     else:
         a = 0
         #print("Neither team has an overall advantage when", teamB, "is on offense.")
         
     # Turnovers
-    if teamA_stats['turnover-margin-per-game_rank'] + 10 < teamB_stats['turnover-margin-per-game_rank']:
+    if teamA_stats['turnover-margin-per-game_rank'] + size < teamB_stats['turnover-margin-per-game_rank']:
         print(teamA, "has the turnover advantage against ", teamB, ". (TOMPG/Rank: ",
               str(teamA_stats['turnover-margin-per-game']), '/', str(teamA_stats['turnover-margin-per-game_rank']),
               " vs Opponent TOMPG/Rank: ", str(teamB_stats['turnover-margin-per-game']),
               str(teamB_stats['turnover-margin-per-game_rank']))
 
-        final_score += 1
+        ht += 1
 
-    elif teamB_stats['turnover-margin-per-game_rank'] + 10 < teamA_stats['turnover-margin-per-game_rank']:
+    elif teamB_stats['turnover-margin-per-game_rank'] + size < teamA_stats['turnover-margin-per-game_rank']:
         print(teamB, "has the turnover advantage against ", teamA, ". (TOMPG/Rank: ",
               str(teamB_stats['turnover-margin-per-game']), '/',
               str(teamB_stats['turnover-margin-per-game_rank']), " vs Opponent TOMPG/Rank: ",
               str(teamA_stats['turnover-margin-per-game']), str(teamA_stats['turnover-margin-per-game_rank']))
 
-        final_score -=1
+        at +=1
 
     else:
         a = 0
@@ -199,37 +509,37 @@ def evaluate(data, teamA, teamB, store = False):
 
     # TeamRankings Rank
     if teamA_stats['predictive-by-other_rank'] < teamB_stats['predictive-by-other_rank']:
-        print(teamA, "has a better TR rating than", teamB, ". (Rating/Rank: ",
+        print(teamA, " has a better TR rating than", teamB, ". (Rating/Rank: ",
               str(teamA_stats['predictive-by-other']), '/', str(teamA_stats['predictive-by-other_rank']),
               " vs Opponent Rating/Rank: ", str(teamB_stats['predictive-by-other']),
               str(teamB_stats['predictive-by-other_rank']))
 
-        final_score += 1
+        ht += 1
 
     else:
-        print(teamB, "has a better TR rating than ", teamA, ". (Rating/Rank: ",
+        print(teamB, " has a better TR rating than ", teamA, ". (Rating/Rank: ",
               str(teamB_stats['predictive-by-other']), '/',
               str(teamB_stats['predictive-by-other_rank']), " vs Opponent Rating/Rank: ",
               str(teamA_stats['predictive-by-other']), str(teamA_stats['predictive-by-other_rank']))
 
-        final_score -=1
+        at +=1
 
-    if final_score > 0:
-        print(teamA, " is likely to win, with a score of ", str(final_score), " (on a scale of -8 to 8)")
+    if ht > at:
+        print(teamA, " is likely to win, with a score of ", str(ht - at), " (on a scale of -8 to 8)")
 
-    elif final_score < 0:
-        print(teamB, " is likely to win, with a score of ", str(-1 * final_score), " (on a scale of -8 to 8)")
+    elif ht < at:
+        print(teamB, " is likely to win, with a score of ", str(at - ht), " (on a scale of -8 to 8)")
 
     else:
         print("Neither team has a clear advantage.")
 
     if store == True:
-        if final_score > 0:
-            return([final_score, teamA])
-        elif final_score < 0:
-            return([-1 * final_score, teamB])
+        if ht > at:
+            return([ht, at, ht - at, teamA])
+        elif at > ht:
+            return([at, ht, at-ht, teamB])
         else:
-            return([final_score, 'Neither'])
+            return([ht, at, ht-at, 'Neither'])
 
 def get_data_nfl(date, attributes):
 
@@ -237,7 +547,7 @@ def get_data_nfl(date, attributes):
     output = output.set_index('team')
 
     for attribute in list(attributes.keys()):
-        if 'predictive' in attribute:
+        if 'by-other' in attribute:
             url = 'https://www.teamrankings.com/nfl/ranking/' + attribute + '?date=' + date
         else:
             url = 'https://www.teamrankings.com/nfl/stat/' + attribute + '?date=' + date
@@ -248,7 +558,7 @@ def get_data_nfl(date, attributes):
 
         z.columns = [attribute + '_rank', 'team', attribute]
 
-        if 'predictive' in attribute:
+        if 'by-other' in attribute:
             z['team'] = [x.split(' (')[0] for x in z['team']]
 
         z = z.set_index('team')
@@ -270,7 +580,7 @@ def get_data_nfl(date, attributes):
 
     return output
 
-def get_schedule(week):
+def get_nfl_schedule(week):
     url = "https://www.teamrankings.com/nfl/schedules/season/" + '?week=' + str(week + 501)
 
     games = pd.read_html(url, flavor='html5lib')[0]
@@ -289,80 +599,23 @@ def get_schedule(week):
 
     return(games)
 
-## 21-6
-## 1 [5-3] | 2 [2-1] | 3 [5-0] | 4 [5-1] | 5 [0-1] | 6 [3-0] | 7 [0-0] | 8 [1-0]
-## Week 5 (10-24)
-# Kansas State > Kansas (6) [W by 41]
-# Coastal Carolina > GA Southen (1) [W by 14]
-# North Carolina > NC State (4) [W by 27]
-# Clemson > Syracuse (4) [W by 26]
-# Charlotte > UTEP (3) [W by 10]
-# Louisville > Florida State (2) [W by 32]
-# Memphis > Temple (3) [W by 12]
-# Auburn > Ole Miss (4) [W by 7]
-# Oklahoma > TCU (1) [W by 19]
-# Liberty > Southern Miss (6) [W by 21]
-# UCF > Tulane (1) [W by 17]
-# Marshall > FAU (2) [W by 11]
-# Oklahoma St > Iowa St (3) -- [W by 3]
-# Notre Dame > Pittsburgh (3) [W by 42]
-# VA Tech > Wake Forest (1) [L by 7]
-# Houston > Navy (4) [W by 16]
-# Rice > MTU (1) [L by 6 in OT]
-# Alabama > Tennessee (6) [W by 31]
-# Texas > Baylor (1) [W by 11]
-# Kentucky > Missouri (5) -- [L by 10]
-# Georgia State > Troy (3) -- [W by 2]
-# Boston College > GA Tech (4) -- [W by 21]
-# WVU > TTU (4) -- [L by 7]
-# LSU  > South Carolina (1) [W by 28]
-# SMU > Cinn (2) [L by 29]
-# AFA > SJSU (1) [L by 11]
-# BYU > Texas St (8) [W by 38]
+def get_ncaa_schedule(week):
+    z = pd.read_html('https://www.teamrankings.com/ncf/schedules/season/?week=' + str(week + 1183), flavor = 'html5lib')[0]
 
-## (10-31)
-# Marshall > FIU (5)
-# Minnesota > Maryland (1)
-# Tulsa > ECU (8)
-# Hawaii > Wyoming (4)
-# KSU > WVU (2) --
-# Wake Forest > Syracuse (4)
-# Clemson > BC (8)
-# ISU > Kansas (8)
-# Georgia = Kentucky (0)
-# Purdue > Illinois (4)
-# CCU > GA State (2)
-# Michigan > MSU (6)
-# Cincinnati > Memphis (5)
-# FAU > UTSA (2)
-# Tulane > Temple (3)
-# UCF > Houston (2)
-# North Texas > UTEP (1)
-# Troy > Ark St (2) --
-# Rice > SMU (2)
-# Notre Dame > GA Tech (8)
-# LSU > Auburn (3)
-# NW > Iowa (5)
-# Indiana = Rutgers (0)
-# Baylor > TCU (4) --
-# Ole Miss > Vanderbilt (3)
-# App St > ULM (7)
-# OK St == Texas (0)
-# VA Tech > Louisville (2)
-# Boise St > AFA (4) --
-# SJSU > UNM (1)
-# Arkansas == Texas A&M --
-# Florida > Missouri (5)
-# OSU > Penn St (1)
-# SMU > Navy (4)
-# UNC > Virginia (6) --
-# ULL > Texas St (6)
-# Oklahoma > TTU (1)
-# SDSU > Utah St (7)
-# BYU > WKU (8)
-# Nevada > UNLV (3)
+    z.columns = ['Teams', 'Drop', 'Drop_2']
 
-#z = pd.read_html('https://www.vegasinsider.com/college-football/scoreboard/', flavor = 'html5lib')
+    z = z[['Teams']]
+
+    z[['Away Team', 'Home Team']] = z['Teams'].str.split("@|vs.", n=1, expand=True)
+
+    z = z.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+
+    z = z.replace('Miami (OH)', 'Miami_OH')
+    z = z.replace('Miami (FL)', 'Miami_FL')
+
+    z = z[['Away Team', 'Home Team']]
+
+    return(z)
 
 def get_historical_nfl_results(years):
 
@@ -440,46 +693,355 @@ def get_historical_nfl_data(start_dates, start_week, attributes):
 
     return(output)
 
-stat_history = get_historical_nfl_data(start_dates = ['2015-10-07', '2016-10-05', '2017-10-04', '2018-10-03', '2019-10-02'],
-                                       start_week = 5,
-                                       attributes={'yards-per-pass-attempt': 'desc',
-                                                   'yards-per-rush-attempt': 'desc',
-                                                   'offensive-points-per-game': 'desc',
-                                                   'opponent-yards-per-pass-attempt': 'asc',
-                                                   'opponent-yards-per-rush-attempt': 'asc',
-                                                   'opponent-offensive-points-per-game': 'asc',
-                                                   'turnover-margin-per-game': 'desc',
-                                                   'predictive-by-other': 'desc'}
-                                       )
+def get_historical_ncaa_data(start_dates, start_week, attributes):
+    df_list = []
 
-#history = get_historical_nfl_results([2015, 2016, 2017, 2018, 2019])
+    for start_date in start_dates:
+        date_list = []
+        for x in range(20):
+            original_date = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+            next_date_to_add = original_date + datetime.timedelta(days=7 * x)
+            next_date_to_add = next_date_to_add.strftime('%Y-%m-%d')
+            date_list.append(next_date_to_add)
 
-#to_eval = history.loc[history['Week'] > 4]
+        start_week_go = start_week
+        for date in date_list:
+            print(date)
+            try:
+                to_concat = get_data_ncaaf(date, attributes)
+            except:
+                new_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+                new_date = new_date + datetime.timedelta(days=1)
+                new_date = new_date.strftime('%Y-%m-%d')
+                print(new_date)
+                to_concat = get_data_ncaaf(new_date, attributes)
 
-#to_eval['pred_winner'] = 'Neither'
-#to_eval['confidence'] = np.nan
+            to_concat['Week'] = start_week_go
+            to_concat['Year'] = date[0:4]
+            to_concat['Date'] = date
 
-#to_eval = to_eval.replace("St. Louis", "LA Rams")
-#to_eval = to_eval.replace("Oakland", "Las Vegas")
-#to_eval = to_eval.replace("San Diego", "LA Chargers")
+            df_list.append(to_concat)
 
-#to_eval = to_eval.reset_index(drop = True)
+            start_week_go += 1
 
-#for row in range(len(to_eval['Home_Team'])):
-#    week_to_locate = to_eval['Week'][row]
-#    year_to_locate = to_eval['Year'][row]
-#    to_eval.loc[row, 'confidence'] = evaluate(stat_history.loc[(stat_history['Year'] == year_to_locate) & (stat_history['Week'] == week_to_locate)],
-#                                        to_eval['Winner'][row], to_eval['Loser'][row], store = True)[0]
-#    to_eval.loc[row, 'pred_winner'] = evaluate(stat_history.loc[(stat_history['Year'] == year_to_locate) & (stat_history['Week'] == week_to_locate)],
-#                                        to_eval['Winner'][row], to_eval['Loser'][row], store = True)[1]
+    output = pd.concat(df_list)
 
-#to_eval['Correct'] = to_eval['Winner'] == to_eval['pred_winner']
+    output['Week'] = output['Week'].astype('int32')
+    output['Year'] = output['Year'].astype('int32')
 
-#we_were_right = to_eval.loc[to_eval['Correct'] == 1]
-#we_were_right.groupby('confidence')['Margin_of_Victory'].median()
+    return (output)
 
-#we_were_wrong = to_eval.loc[to_eval['Correct'] == 0]
-#we_were_wrong.groupby('confidence')['Margin_of_Victory'].summarize()
+def cap_helper(x):
+    x = re.sub("[a-z][A-Z]", lambda ele: ele[0][0] + " " + ele[0][1], x)
 
-#we_did_know = to_eval.loc[to_eval['confidence'] > 2]
-#we_did_know.groupby('Year')['Correct'].apply(lambda x: x.sum() / len(x))
+    return(x)
+
+def date_helper(x, year1, year2):
+    x = str(int(x))
+    if len(x) > 3:
+        first = x[0:2]
+    else:
+        first = x[0]
+    if int(first) < 8:
+        x = x + year2
+    else:
+        x = x + year1
+
+    if int(first) < 10:
+        x = '0' + x
+
+    x = datetime.datetime.strptime(x, '%m%d%Y').strftime('%Y-%m-%d')
+    return(x)
+
+def process_historical_ncaa_data():
+
+    fin_output = pd.DataFrame({'DATE': [], 'HOME_TEAM': [], 'WINNER': [], 'LOSER': [], 'PTS_WINNER': [],
+                               'PTS_LOSER': [], 'OPEN_SPREAD_WINNER': [], 'OPEN_SPREAD_LOSER': [],
+                               'CLOSE_SPREAD_WINNER': [], 'CLOSE_SPREAD_LOSER': [], 'MONEY_LINE_WINNER': [],
+                               'MONEY_LINE_LOSER': [], 'MARGIN_OF_VICTORY': []})
+
+    years = ['2007-08', '2008-09', '2009-10', '2010-11', '2011-12', '2012-13', '2013-14', '2014-15', '2015-16', '2016-17', '2017-18', '2018-19',
+             '2019-20']
+
+    years_dict = {'2007-08': ['2007', '2008'], '2008-09': ['2008', '2009'], '2009-10': ['2009', '2010'],
+                  '2010-11': ['2010', '2011'], '2011-12': ['2011', '2012'], '2012-13': ['2012', '2013'],
+                  '2013-14': ['2013', '2014'], '2014-15': ['2014', '2015'], '2015-16': ['2015', '2016'],
+                  '2016-17': ['2016', '2017'], '2017-18': ['2017', '2018'], '2018-19': ['2018', '2019'],
+                  '2019-20': ['2019', '2020']}
+
+    for file in years:
+        z = pd.read_excel('/Users/brodyvogel/Downloads/ncaa football ' + file + '.xlsx')
+
+        for x in range(len(z['Date']) - 1):
+            if z['Date'][x] > z['Date'][x + 1]:
+                z.loc[x, 'Date'] = z['Date'][x + 1]
+
+        years = years_dict[file]
+        z['Team'] = z['Team'].apply(cap_helper)
+        z['Date'] = z['Date'].apply(date_helper, args=(years[0], years[1]))
+
+        z['Open'] = np.asarray([100 if x == 'NL' else 0 if x == 'pk' else x for x in z['Open']])
+        z['Close'] = np.asarray([100 if x == 'NL' else 0 if x == 'pk' else x for x in z['Close']])
+
+        z['Open'] = z['Open'].astype('str')
+        z['Close'] = z['Close'].astype('str')
+
+        z.loc[["," in x for x in z['Open']], 'Open'] = 'adfadad'
+        z.loc[[len(x) > 4 for x in z['Open']], 'Open'] = np.nan
+
+        z.loc[["," in x for x in z['Close']], 'Close'] = 'sdfadf'
+        z.loc[[len(x) > 4 for x in z['Close']], 'Close'] = np.nan
+
+        z['Open'] = z['Open'].astype('float')
+        z['Close'] = z['Close'].astype('float')
+
+        output = pd.DataFrame({'DATE': [], 'HOME_TEAM': [], 'WINNER': [], 'LOSER': [], 'PTS_WINNER': [],
+                               'PTS_LOSER': [], 'OPEN_SPREAD_WINNER': [], 'OPEN_SPREAD_LOSER': [],
+                               'CLOSE_SPREAD_WINNER': [], 'CLOSE_SPREAD_LOSER': [], 'MONEY_LINE_WINNER': [],
+                               'MONEY_LINE_LOSER': [], 'MARGIN_OF_VICTORY': []})
+
+        for x in range(0, len(z['Team']), 2):
+            date = z['Date'][x]
+
+            if z['VH'][x] == 'V':
+                home_team = z['Team'][x + 1]
+            else:
+                home_team = 'Neutral'
+
+            if z['Final'][x] > z['Final'][x + 1]:
+                winner = z['Team'][x]
+                loser = z['Team'][x + 1]
+                pts_winner = z['Final'][x]
+                pts_loser = z['Final'][x + 1]
+            else:
+                winner = z['Team'][x + 1]
+                loser = z['Team'][x]
+                pts_winner = z['Final'][x + 1]
+                pts_loser = z['Final'][x]
+
+            spreads = z.iloc[x:(x + 2), :][['Open', 'Close']]
+            if spreads['Open'][x] > spreads['Open'][x + 1]:
+                z.loc[x, 'Open'] = z.loc[x + 1, 'Open']
+                z.loc[x + 1, 'Open'] = -1 * z.loc[x + 1, 'Open']
+            else:
+                z.loc[x + 1, 'Open'] = z.loc[x, 'Open']
+                z.loc[x, 'Open'] = -1 * z.loc[x, 'Open']
+            if spreads['Close'][x] > spreads['Close'][x + 1]:
+                z.loc[x, 'Close'] = z.loc[x + 1, 'Close']
+                z.loc[x + 1, 'Close'] = -1 * z.loc[x + 1, 'Close']
+            else:
+                z.loc[x + 1, 'Close'] = spreads.loc[x, 'Close']
+                z.loc[x, 'Close'] = -1 * spreads.loc[x, 'Close']
+
+            if z['Final'][x] > z['Final'][x + 1]:
+                open_spread_winner = z['Open'][x]
+                close_spread_winner = z['Close'][x]
+
+                open_spread_loser = z['Open'][x + 1]
+                close_spread_loser = z['Close'][x + 1]
+
+                ml_winner = z['ML'][x]
+                ml_loser = z['ML'][x + 1]
+
+            else:
+                open_spread_winner = z['Open'][x + 1]
+                close_spread_winner = z['Close'][x + 1]
+
+                open_spread_loser = z['Open'][x]
+                close_spread_loser = z['Close'][x]
+
+                ml_winner = z['ML'][x + 1]
+                ml_loser = z['ML'][x]
+
+            margin_of_victory = pts_winner - pts_loser
+
+            new_row = {'DATE': date, 'HOME_TEAM': home_team, 'WINNER': winner, 'LOSER': loser, 'PTS_WINNER': pts_winner,
+                       'PTS_LOSER': pts_loser, 'OPEN_SPREAD_WINNER': open_spread_winner,
+                       'OPEN_SPREAD_LOSER': open_spread_loser,
+                       'CLOSE_SPREAD_WINNER': close_spread_winner, 'CLOSE_SPREAD_LOSER': close_spread_loser,
+                       'MONEY_LINE_WINNER': ml_winner, 'MONEY_LINE_LOSER': ml_loser,
+                       'MARGIN_OF_VICTORY': margin_of_victory}
+
+            output = output.append(new_row, ignore_index=True)
+
+        print(file)
+
+        fin_output = pd.concat([fin_output, output])
+
+    fin_output = fin_output.reset_index(drop=True)
+
+    fin_output['COVERED_OPEN'] = np.asarray([
+        np.nan if np.isnan(fin_output['OPEN_SPREAD_WINNER'][x]) == True
+        else 0 if fin_output['OPEN_SPREAD_WINNER'][x] > 0
+        else 0 if fin_output['MARGIN_OF_VICTORY'][x] < (-1 * fin_output['OPEN_SPREAD_WINNER'][x])
+        else 1 for x in range(len(fin_output['DATE']))])
+
+    fin_output['COVERED_CLOSE'] = np.asarray([
+        np.nan if np.isnan(fin_output['CLOSE_SPREAD_WINNER'][x]) == True
+        else 0 if fin_output['CLOSE_SPREAD_WINNER'][x] > 0
+        else 0 if fin_output['MARGIN_OF_VICTORY'][x] < (-1 * fin_output['CLOSE_SPREAD_WINNER'][x])
+        else 1 for x in range(len(fin_output['DATE']))])
+
+    for day in range(len(fin_output['DATE'])):
+        cur_date = datetime.datetime.strptime(fin_output['DATE'][day], '%Y-%m-%d')
+
+        if cur_date.weekday() == 0:
+            cur_date = cur_date
+        elif cur_date.weekday() == 1:
+            cur_date = cur_date - datetime.timedelta(days=1)
+        elif cur_date.weekday() == 2:
+            cur_date = cur_date - datetime.timedelta(days=2)
+        elif cur_date.weekday() == 3:
+            cur_date = cur_date - datetime.timedelta(days=3)
+        elif cur_date.weekday() == 4:
+            cur_date = cur_date - datetime.timedelta(days=4)
+        elif cur_date.weekday() == 5:
+            cur_date = cur_date - datetime.timedelta(days=5)
+        elif cur_date.weekday() == 6:
+            cur_date = cur_date - datetime.timedelta(days=6)
+
+        cur_date = cur_date.strftime('%Y-%m-%d')
+
+        fin_output.loc[day, 'DATE'] = cur_date
+
+    proper_names = {"App State": "Appalachian State",
+                    "Appalachian St": "Appalachian State",
+                    "Alabama Crimson": "Alabama",
+                    "Arizona U": "Arizona",
+                    "Arizona St": "Arizona State",
+                    "Arkansas St": "Arkansas State",
+                    "Arkansas State Red": "Arkansas State",
+                    "BYU": "Brigham Young",
+                    "Boston Col": "Boston College",
+                    "Bowling Grn": "Bowling Green State",
+                    "Bowling Green": "Bowling Green State",
+                    "Buffalo U": "Buffalo",
+                    "California Golden": "California",
+                    "Central FL": "Central Florida",
+                    "Central Mich": "Central Michigan",
+                    "Cincinnati U": "Cincinnati",
+                    "Coastal Car": "Coastal Carolina",
+                    "Colorado St": "Colorado State",
+                    "Duke Blue": "Duke",
+                    "E Carolina": "East Carolina",
+                    "E Michigan": "Eastern Michigan",
+                    "Fla Atlantic": "Florida Atlantic",
+                    "Florida Intl": "Florida International",
+                    "Florida St": "Florida State",
+                    "Fresno St": "Fresno State",
+                    "GA Southern": "Georgia Southern",
+                    "GA Tech": "Georgia Tech",
+                    "Georgia Tech Yellow": "Georgia Tech",
+                    "Hawai'i Rainbow": "Hawaii",
+                    "Houston U": "Houston",
+                    "Illinois Fighting": "Illinois",
+                    "Kansas St": "Kansas State",
+                    "Kent State Golden": "Kent State",
+                    "LA Lafayette": "Louisiana",
+                    "Lafayette": "Louisiana",
+                    "ULLafayette": "Louisiana",
+                    "Louisiana Ragin'": "Louisiana",
+                    "LA Monroe": "Louisiana-Monroe",
+                    "UL-Monroe": "Louisiana-Monroe",
+                    "ULMonroe": "Louisiana-Monroe",
+                    "UL Monroe": "Louisiana-Monroe",
+                    "LA Tech": "Louisiana Tech",
+                    "LSU": "Louisiana State",
+                    "U Mass": "Massachusetts",
+                    "UMass": "Massachusetts",
+                    "Miami Florida": "Miami_FL",
+                    "Miami Ohio": "Miami_OH",
+                    "Miami (OH)": "Miami_OH",
+                    "Michigan St": "Michigan State",
+                    "Middle Tenn": "Middle Tennessee State",
+                    "Middle Tennessee Blue": "Middle Tennessee State",
+                    "Mid Tennessee State": "Middle Tennessee State",
+                    "Middle Tenn St": "Middle Tennessee State",
+                    "Minnesota U": "Minnesota",
+                    "Miss State": "Mississippi State",
+                    "Nevada Wolf": "Nevada",
+                    "N Carolina": "North Carolina",
+                    "N Mex State": "New Mexico State",
+                    "NC State": "North Carolina State",
+                    "NCState": "North Carolina State",
+                    "N Illinois": "Northern Illinois",
+                    "NO Illinois": "Northern Illinois",
+                    "North Carolina Tar": "North Carolina",
+                    "Notre Dame Fighting": "Notre Dame",
+                    "North Texas Mean": "North Texas",
+                    "UNLV": "Nevada-Las Vegas",
+                    "Ole Miss": "Mississippi",
+                    "Oklahoma St": "Oklahoma State",
+                    "Oregon St": "Oregon State",
+                    "Penn State Nittany": "Penn State",
+                    "Pittsburgh U": "Pittsburgh",
+                    "Rutgers Scarlet": "Rutgers",
+                    "San Diego St": "San Diego State",
+                    "San Jose St": "San Jose State",
+                    "San José State": "San Jose State",
+                    "S Alabama": "South Alabama",
+                    "S Carolina": "South Carolina",
+                    "S Florida": "South Florida",
+                    "S Methodist": "Southern Methodist",
+                    "SMU": "Southern Methodist",
+                    "S Mississippi": "Southern Mississippi",
+                    "Southern Miss": "Southern Mississippi",
+                    "UAB": "Alabama-Birmingham",
+                    "USC": "Southern California",
+                    "Tulsa Golden": "Tulsa",
+                    "TX Christian": "Texas Christian",
+                    "Texas Tech Red": "Texas Tech",
+                    "TCU": "Texas Christian",
+                    "TCU Horned": "Texas Christian",
+                    "Tennessee U": "Tennessee",
+                    "TX El Paso": "Texas-El Paso",
+                    "UCF": "Central Florida",
+                    "UTEP": "Texas-El Paso",
+                    "TX-San Ant": "Texas-San Antonio",
+                    "UTSA": "Texas-San Antonio",
+                    "Tex San Antonio": "Texas-San Antonio",
+                    "VA Tech": "Virginia Tech",
+                    "Washington U": "Washington",
+                    "W Kentucky": "Western Kentucky",
+                    "W Michigan": "Western Michigan",
+                    "W Virginia": "West Virginia",
+                    "Wash State": "Washington State"}
+
+    for x in range(len(fin_output['HOME_TEAM'])):
+        try:
+            fin_output.loc[x, 'HOME_TEAM'] = proper_names[fin_output['HOME_TEAM'][x]]
+        except:
+            fin_output.loc[x, 'HOME_TEAM'] = fin_output.loc[x, 'HOME_TEAM']
+
+        try:
+            fin_output.loc[x, 'WINNER'] = proper_names[fin_output['WINNER'][x]]
+        except:
+            fin_output.loc[x, 'WINNER'] = fin_output.loc[x, 'WINNER']
+
+        try:
+            fin_output.loc[x, 'LOSER'] = proper_names[fin_output['LOSER'][x]]
+        except:
+            fin_output.loc[x, 'LOSER'] = fin_output.loc[x, 'LOSER']
+
+    return(fin_output)
+
+#ncaa_history = get_historical_ncaa_data(['2007-08-27', '2008-08-25', '2009-08-31', '2010-08-30', '2011-08-29', '2012-08-27', '2013-08-26', '2014-08-25', '2015-08-31',
+#                              '2016-08-22', '2017-08-21', '2018-08-20', '2019-08-19'], attributes =
+#                                                        {'yards-per-pass-attempt': 'desc',
+#                                                       'yards-per-rush-attempt': 'desc',
+#                                                       'offensive-points-per-game': 'desc',
+#                                                       'opponent-yards-per-pass-attempt': 'asc',
+#                                                       'opponent-yards-per-rush-attempt': 'asc',
+#                                                       'opponent-offensive-points-per-game': 'asc',
+#                                                       'turnover-margin-per-game': 'desc',
+#                                                       'predictive-by-other': 'desc',
+#                                                       'schedule-strength-by-other': 'desc'}, start_week = 1)
+
+#ncaa_history = ncaa_history.reset_index()
+#for x in range(len(ncaa_history['team'])):
+#    try:
+#        ncaa_history.loc[x, 'team'] = proper_names[ncaa_history['team'][x]]
+#    except:
+#        ncaa_history.loc[x, 'team'] = ncaa_history.loc[x, 'team']
+
+#ncaa_history = ncaa_history.set_index('team')

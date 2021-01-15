@@ -1,0 +1,170 @@
+Week 10 (11-15)
+Indianapolis == Tennessee; Ind -1 [Ind by 17]
+Philadelphia == NYG; Phi -4
+Cleveland > Houston (4); Cle -3.5 --
+Detroit > Washington (1); Det -3
+Green Bay > Jacksonville (5); GB -13.5
+Tampa Bay > Carolina (3); TB -6.5 --
+Arizona > Buffalo (3); Ari -3
+LAC == Miami; Mia -2
+LV > Denver (1); LV -4
+New Orleans > SF (2); NO -9
+Seattle > LAR (1); LAR -2.5 --
+Pitt > Cincinnati (7); Pitt -7 --
+Baltimore > NE (5); Bal -7
+Minnesota > Chicago (3); Min -3
+
+
+Week 11 (11-22)
+Seattle > Arizona (3); [W by 7]
+Washington > Cincinnati (1); WAS -2
+Pittsburgh > Jacksonville (5); PITT -10.5
+Carolina > Detroit (4); PICK --
+Baltimore > Tennessee (5); BAL -6
+Cleveland > Philadelphia (1); CLE -2.5
+New England > Houston (1); NE -2
+New Orleans > Atlanta (4); NO -3.5
+Miami == Denver; MIA -3.5
+LAC > NYJ (3); LAC -9.5
+Green Bay > Indianapolis (5); IND -2 --
+Minnesota > Dallas (6); MIN -7.5
+KC > LV (3); KC -7.5
+TB > LAR (3); TB -3.5
+
+Week 12 (11-29)
+Houston [3] == Detroit; HOU -3
+Washington > Dallas (1); DAL -3
+Minnesota > Carolina (1)
+Miami > NYJ (4) [1]
+Cleveland > Jacksonville (7)
+Las Vegas > Atlanta (3) [5]
+Buffalo > LAC (2) [4]
+NYG > Cincinnati (5)
+Indianapolis > Tennessee (1) [0]
+Arizona > NE (5) [0]
+Baltimore [4] == Pittsburgh
+New Orleands > Denver (6)
+LAR > San Francisco (4)
+KC > TB (1) [0]
+GB > Chicago (4)
+Seattle > Philadelphia (3) [6]
+
+Week 13 (12-6)
+Tennessee > Cleveland (1) [5]; TEN -5.5 ~~-
+LV > NYJ (3) [6]; LV -8.5
+Minneosta > Jacksonville (4) [5]; MIN -10
+Miami > Cinn (4); MIA -11.5
+Indianapolis > Houston (5) [3]; IND -3.5
+Chicago > Detroit (4); CHI -3 ---
+New Orleans > Atlanta (5) [7]; NO -3 ---
+Seattle > NYG (4) [5]; SEA -10.5
+LAR > Arizona (2) [4]; LAR -2.5 -~-
+GB > PHI (4) [5]; GB -8.5
+NE > LAC (1) [2]; PICK -~-
+KC > DEN (5); KC -14
+PITT > WAS (2); PIT -7 -!!
+BAL > DAL (6);
+
+Week 14 (12-13)
+LAR > NE (4);
+Houston > Chicago (1) [0]; HOU -1.5
+Dallas == Cincinnati [DAL 3]; DAL -3
+Tennessee > Jacksonville (5); TEN -7.5
+Kansas City > Miami (4) [6]; KC -7
+Arizona > NYG (2) [1]; ARI -2.5
+TB > Minnesota (2) [5]; TB -6.5
+Carolina > Denver (3) [2]; CAR -3
+Indianapolis > Oakland (4) [0]; IND -3
+Seattle > NYJ (3) [7]; SEA -13.5
+GB > Detroit (5) [6];
+New Orleans > Philadelphia (5); NO -7.5
+Atlanta > LAC (2) [3]; ATL -2.5
+Pitt > Buffalo (4); BUF -3
+Baltimore > CLE (2) [5]; BAL -2.5
+
+Week 15 (12-20)
+LV > LAC (2) [3];
+Buffalo > Denver (3); BUF -6 -
+GB > Carolina (2); GB -8.5 -f
+Miami > NE (1) [NE 4]; MIA -3 -f
+Baltimore > Jacksonville (6) [7]; BAL -13 -p
+TB > Atlanta (4) [7]; TB -6 -
+SF > Dallas (6) [8]; SF -3 -
+Chicago == Minnesota [CHI 1]; MIN -3
+Seatlle > WAS (2) SEA -6
+Indianapolis > Houston (5) [3]; IND -7.5
+Tennessee > Detroit (6) [5]; TEN -11
+LAR > NYJ (5) [7]; LAR -17
+Arizona > Philadelphia (4) [1]; ARI -6.5 -f
+NO > KC (1); KC -3 -f
+CLE > NYG (3) [0]; CLE -4.5
+Pitt > Cinn (6); PIT -13
+
+Week 16 (12-27)
+NO > Minnesota (4) [5]; NO -6.5
+TB > Detroit (5); TB -9
+Arizona > SF (2) [SF 2]; ARI -5.5
+Miami > LV (2) [LV 1]; MIA -2.5
+Pit > Ind (2);
+BAL > NYG (3) [5];
+CHI > JAX (4) [7];
+HOU > CIN (2);
+KC > ATL (3) [8];
+CLE > NYJ (6) [3];
+CAR > WAS (2) [3];
+LAC > DEN (2) [DEN 3];
+SEA > LAR (1) [LAR 3];
+PHI > DAL (2);
+TEN == GB;
+BUF > NE (3) [2];
+
+Week 17 (1-3)
+NE > NYJ (4);
+Buffalo > Miami (7) [8];
+Baltimore > Cincinnati (7) [8];
+Minnesota > Detroit (5);
+Dallas > NYG (6);
+Atlanta == TB;
+Pittsburgh > Cleveland (2);
+San Francisco > Seattle (4);
+LAR > Arizona (4);
+Denver > LV (1) [3];
+NO > Carolina (4);
+Indianapolis > Jacksonville (3);
+Tennessee > Houston (4) [==];
+GB > Chicago (2);
+KC > LAC (4) [6];
+Philadelphia > Washington (3);
+
+# No-Brainer NFL (75%) / Good Bet (60%) / Better Than Chance (50%)
+# 0: 75% chance game is within 14
+#    60% chance game is within 10
+#    50% chance game is within 7
+#    30% chance game is within 4
+#    25% chance game is within 3
+
+# 1: +6.5 / +1.5 / -2.5
+#    -8.5 / -4.5 / -3.5
+
+# 2: +5.5 / +1.5 / -2.5
+#    -13.5 / -7.5 / -3.5
+
+# 3: +3.5 / -2.5 / -5.5
+#    -16.5 / -8.5 / -6.5
+
+# 4: +3.5 / -2.5 / -6.5
+#    -16.5 / -10.5 / -7.5
+
+# 5: -2.5 / -4.5 / -8
+#    -18.5 / -13.5 / -9
+
+# 6: -2.5 / -6 / -12.5
+#    -21.5 / -15.5 / -13.5
+
+# 7: -5.5 / -9 / -13
+#    -25 / -17.5 / -14
+
+# 8: -6.5 / -9 / -13
+#    -25 / -17.5 / -14
+
+

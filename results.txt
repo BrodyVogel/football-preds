@@ -1,0 +1,385 @@
+# Week 10 (11-7)
+# Kent State > E Michigan (6) [W by 4]
+# WMU > Akron (7) [W by 45]
+# Ball St > Miami OH (1) [L by 7]
+# Buffalo > NIU (4) [W by 19]
+# Ohio == CMU [CMU Wins by 3]
+# Toledo > Bowling Green (4) [W by 35]
+# Nevada > USU (8) [W by 25]
+# Wyoming > CSU (6) [L by 10]
+# Miami FL > NCST (6); Miami FL -10.5 [W by 3]
+# SDSU > SJSU (4); SDSU -9.5 [L by 11]
+# BYU > BSU (2); BYU -3.5 [W by 34]
+# Iowa > MSU (2); Iowa -6.5 [W by 42]
+# Michigan > Indiana (1); Michigan -3
+# NW > Nebraska (6); NW -3.5 --
+# UNC > Duke (7); UNC -11.5
+# Tulsa > Navy (7)
+# Memphis > USF (7); Memphis -17.5
+# ULL > Ark St. (8); ULL -14
+# SMU > Temple (5); SMU -17.5
+# VA Tech == Liberty; VA Tech -15 --
+# Texas > WVU (1); Texas -7
+# GSU > ULM (8); GSU -18.5 --
+# Tulane > ECU (3); Tulane -5
+# GA Southern > Troy (1); Troy -3 --
+# BC > Syracuse (3); BC -13.5
+# Marshall > UMASS (8); Marshall -44.5
+# APP St > Texas St (7); App St -20 --
+# Miss St > Vanderbilt (3); MSU -18.5
+# Rice > UTSA (4)
+# Charlotte > MTU (3); Charlotte -4.5
+# TCU > TTU (4); TCU -8.5
+# Cinn > Houston (8); Cinn -13.5 --
+# Fresno St > UNLV (4); FSU -11
+# Penn St > MD (3); PSU -24.5
+# Minnesota > Ill (1); Minn -7
+# Oklahoma > Kansas (8); OK -37.5
+# Pitt > FSU (4); FSU -2 --
+# OK ST > KSU (3); OK St -12
+# FAU > WKU (4); FAU -7
+# ISU > Baylor (3); ISU -14
+# N Texas == LA Tech
+# TAM > S Carolina (2); TAM -9.5
+# Clemson > ND (3); Clemson -5
+# OSU > Rutgers (6); OSU -37
+# Arkansas > Tenn (1); Tenn -1
+# CCU > S Alabama (7); CCU -17.5 --
+# Hawaii > UNM (5); Hawaii -16''
+
+########
+
+# Week 11 (11-14)
+# Ohio > Akron (6) [W by 14]
+# Kent St > Bowling Grn (6) [W by 38]
+# Buffalo > Miami OH (8) [W by 32]
+# Ball St > EMU (2) [W by 7]
+# WMU > Toledo (4) [W by 3]
+# CMU > NIU (8) [W by 30]
+# Boise St > CSU (2) [W by 31]
+# FIU > FAU (1)
+# Iowa > Minnesota (6)
+# CCU > Troy (8)
+# Cincinnati > ECU (7)
+# Army > Tulane (2); Tulane -3.5 --
+# UNC > Wake (4); UNC -13.5
+# Penn St > Nebraska (2); PSU -3
+# Marshall > MTU (6); Marshall -23.5
+# Indiana > MSU (4); Indiana -7.5
+# WVU == TCU; WVU -3.5
+# Kentucky > Vanderbilt (4); Kentucky -17.5
+# Miami FL > VA Tech (1); VA Tech -2.5
+# ULL > S Alabama (5); ULL -16.5
+# Fresno St > Utah St (7); FSU -10 --
+# App St > GA St (5); App St -17
+# UTSA > UTEP (2); UTSA -6.5
+# USC > Arizona (1); USC -15
+# Stanford == Colorado; Stanford -8.5
+# Houston > USF (3); Houston -14
+# Southern Miss == WKU; WKU -8 --
+# Virginia > Louisville (1); VA -3.5
+# GA Southern > Texas St (7); GA South -10 --
+# Notre Dame > BC (6); ND -11.5
+# SDSU > Hawaii (6); SDSU -10
+# Baylor > TTU (3); Baylor -1
+# Florida > Arkansas (3); FLA -17.5
+# Tulsa > SMU (3); Tulsa -1
+# Oregon > WSU (1); Oregon -10
+# UCF > Temple (7); UCF -25
+# NC St > FSU (5); NC St -10.5
+# Miss == South Carolina; Miss -12
+# Wisconsin > Michigan (4); Wisc -4.5
+# NW > Purdue (3); NW -3 --
+# SJSU > UNLV (8); SJSU -15.5
+# Washington > OSU (1); Wash -14
+
+###################
+
+# Week 12 (11-21)
+# Buffalo > Bowling Green (6) [W by 25]
+# Kent St > Akron (6) [W by 34]
+# WMU > CMU (3) [W by 8]
+# Ball St > NIU (6) [W by 6]
+# Toledo > EMU (4) [W by 17]
+# Tulsa > Tulane (1)
+# Louisville > Syracuse (6); Lville -18.5
+# Purdue > Minnesota (4); Purdue -2.5 ----
+# FAU > UMASS (6); FAU -32.5
+# Air Force > UNM (4); AFA -7.5
+# OSU > Indiana (3); OSU -20 --
+# Nebraska > Illinois (2); Neb -14.5 ----
+# Coastal Car > App St (3); CCU -4.5
+# ECU == Temple; ECU -4.5
+# SMU > Houston (1)
+# Florida > Vanderbilt (8); Florida -31
+# Arkansas == LSU; LSU -2.5
+# Clemson > FSU (8); Clemson -35.5
+# Wake > Duke (3)
+# GA Southern == Army; Army -4
+# Marshall > Charlotte (8)
+# FIU > WKU (1); WKU -7.5 ----
+# Rice > North Texas (4); NT -1 ----+
+# Texas State > Arkansas St (1); Ark St -6 ----
+# UTSA > Southern Miss (5); UTSA -7.5
+# SDSU > Nevada (4); SDSU -1 --
+# Cinn > UCF (4); Cinn -5.5
+# Cal == Oregon St; Cal -3.5
+# Texas > Kansas (8)
+# TAM > Mississippi (4)
+# Iowa > Penn St (6); Iowa -2.5 ----+
+# Troy > MTSU (5)
+# Wisconsin > NW (3); Wisconsin -7.5
+# Alabama > Kentucky (5); Alabama -30
+# ISU > KSU (1); ISU -11
+# VA Tech > Pitt (6); VA Tech -3 --
+# GA St > S Alabama (4); GA St -3.5
+# CSU > UNLV (6)
+# SJSU > Fresno St (3); SJSU -2.5
+# Auburn > Tenn (4); Auburn -10.5
+# Oklahoma > Ok St (2); Oklahoma -7
+# S Carolina > Missouri (2); Missouri -6
+# Liberty > NC St (3); NC St -3.5
+# Georgia > Miss St (2); Georgia -24.5
+# Michigan > Rutgers (3)
+# Washington > Arizona (4); Washington -11
+# Navy > USF (4)
+# USC > Utah (1); USC -3
+# UCLA == Oregon; Oregon -15.5 --
+# WSU > Stanford (3); Stanford -2
+# Boise St > Hawaii (3); Boise St -15
+
+#######################################
+
+# Week 13 (11-28)
+UNM > USU (5); UNM -6 ----+
+Texas > ISU (1); ISU -1
+Liberty > UMASS (8); Liberty -37.5
+Iowa > Nebraska (6); Iowa -13.5 --+
+UCF > USF (8); UCF -25
+ND > UNC (4); ND -4.5 --
+Wyoming > UNLV (7); Wyoming -16.5 ----+
+Stanford > Cal (3); Stanford -1 ----!
+CMU > EMU (5); CMU -7 ----+
+Oregon > Oregon St (4); Oregon -13.5
+GA Southern > GSU (6); GA Southern -1.5 --!--
+OSU > Illinois (5); OSU -28
+Michigan > PSU (1); Michigan -2.5
+Indiana > Maryland (1) [2]; Indiana -11
+Toledo > Ball St (5); Toledo -10 --+
+Ohio > Bowling Green (6); Ohio -24.5
+Florida > Kentucky (2); Florida -24.5 --
+Missouri > Vanderbilt (6); Missouri -14.5 --
+OK St > TTU (4); OK St -11 --
+WMU > NIU (8); WMU -19 --+
+NC St > Syracuse (4); NC St -14.5
+Buffalo > Kent St (2); Buffalo -7.5
+SMU > ECU (5); SMU -12 ----+
+Miami OH > Akron (3); Miami OH -14.5 --!
+Rice > UTEP (4); Rice -11 --
+UTSA > NT (1) [2]; UTSA -3 --!
+ULL > ULM (8); ULL -28.5
+CCU > TSU (8); CCU -16.5 --+
+Arkansas St == S Alabama; Arkansas St -6.5 --!
+Clemson > Pitt (6); Clemson -23.5
+NW > MSU (3); NW -13 ----
+Alabama > Auburn (6); Alabama -24.5
+FAU > MTSU (5); FAU -6 ----+
+LVille > BC (4); BC -1 --!!
+SJSU > BSU (4); BSU -11 --!
+Miss > Miss St (3); Miss -10 --+
+Purdue > Rutgers (5)
+Memphis > Navy (4); Memphis -14
+TAM > LSU (4); TAM -14.5
+Baylor > KSU (2); Baylor -5
+Duke > GA Tech (2); PK
+Tennessee > Vanderbilt (5)
+Georgia > SC (4); Georgia -21
+OK > WVU (2)
+TCU > Kansas (7) [8]; TCU -24
+App St > Troy (3); App St -14 ----!
+VA > FSU (5) [6]; VA -9.5 ----
+UCLA > Arizona (3); UCLA -10
+Wash > Utah (6) [5]; Wash -10 ----+
+Nevada > Hawaii (6); Nevada -7 ----+
+Charlotte > WKU (1)
+Miami FL > Wake (4)
+
+#######################################
+
+# Week 14 (12-5)
+
+LA Tech > North Texas (1); NT -1
+AFA > USU (8); AFA -13
+ULL > APP St (2); APP St -2.5 -~~
+Marshall > Rice (6); Marshall -23.5
+TTU > Kansas (7); TTU -27.5
+Toledo > NIU (8); Toledo -9.5 --!
+Purdue > Nebraska (1); Purdue -1.5
+Penn St > Rutgers (1); Penn St -11.5 -~~
+OSU > MSU (5) [6]; OSU -24
+TAM > Auburn (7); TAM -6.5 -~~
+Tulane > Memphis (5); Tulane -1.5 -~~
+Arkansas > Missouri (2); Missouri -3 -~~
+Texas > KSU (6); Texas -7 --
+TCU > OK St (1); OK St -2 -!
+Troy > USA (2) [1]; Troy -4.5
+Bowling Grn > Akron (1); Akron -2.5
+WMU > EMU (7) [6]; WMU -13.5 --
+CMU > Ball St (5); CMU -1.5 -~
+ND > Syracuse (7); ND -34
+Ark St > ULM (4) [5]; Ark St -21
+Buffalo > Ohio (2); Buffalo -11.5
+Tulsa > Navy (6) [8]; Tulsa -12 -~
+ISU > WVU (2); ISU -6.5
+BC == UVA; UVA -4
+Iowa > Illinois (6); Iowa -13.5
+Florida > Tenn (6); Florida -17.5 --
+Georgia > Vanderbilt (8); Georgia -35.5
+Wash > Stanford (6) [5]; Wash -11.5
+NC St > GA Tech (4); NC St -6.5 -~
+SJSU > Hawaii (7); SJSU -2 -~
+BYU > CCU (3); BYU -10
+FAU == GA Southern [1]; GA Southern -2.5
+Colorado > Arizona (8) [7]; Colorado -7 --
+SDSU > CSU (2); SDSU -8
+Oregon > Cal (4); Oregon -9
+Clemson > VA Tech (6); Clemson -22 --
+Kentucky > SC (5); Kentucky -11.5
+Miami FL > Duke (8); Miami FL -15 -~
+Oklahoma > Baylor (5) [6]; Oklahoma -22
+Alabama > LSU (8); Alabama -29.5
+SMU == Houston; SMU -1.5
+Oregon St > Utah (1); Utah -11 -~
+UCLA == Arizona St; ASU -3 -
+Wyoming > UNM (7) [6]; Wyoming -17.5
+Nevada == Fresno St; Nevada -7 --
+Charlotte > WKU (1); Charlotte -1.5
+USC > WSU (4); USC -13
+
+#######################################
+
+# Week 15 (12-12)
+
+FAU > Southern Miss (4) [10.5]; FAU -9.5
+Pittsburh > GA Tech (4) [6.5]; Pitt -7.5
+UNT > UTEP (2) [6.5]; UNT -10
+ASU > Arizona (3) [11.5]; ASU -11.5 -!~
+Ball St > WMU (1) [0]; Ball St -2.5
+Utah == Colorado [Colorado 5.5]; Colorado -2.5 ---
+Oklahoma > WVU (4) [10.5];
+Nebraska == Minnesota [Neb 0.5]; Nebraska -10.5 -~-
+EMU > NIU (2) [6]; EMU -6 ---
+NW > Illinois (3) [12.5]; NW -14 +
+Maryland > Rutgers (2) [2.5]; Maryland -7.5
+Alabama > Arkansas (6) [15.5]; Alabama -32
+Georgia > Missouri (6) [9.5]; Georgia -13 -~-
+Wake Forest > Louisville (1) [1]; Louisville -1.5 +
+UAB > Rice (1) [4]; UAB -7.5
+Buffalo > Akron (7) [26]; Buffalo -32.5
+CCU > Troy (8) [16.5]; CCU -13.5 ---
+Army > Navy (3) [12]; Army -7 -!~ +
+Toledo > CMU (1) [6.5]; Toledo -11.5
+Memphis > Houston (1) [1]; Houston -5
+Iowa == Wisconsin [Iowa 1]; Wisconsin -2
+Miami FL > UNC (1) [1.5]; Miami -3
+PSU > MSU (2) [10]; Penn St -15.5 +
+Tennessee > Vanderbilt (5) [13.5]; Tennessee -15.5 -!~ +
+Washington > Oregon (2) [0];
+Duke == FSU [Duke 2]; FSU -5
+Boise St > Wyoming (1) [Wyoming 0.5]; BSU -11.5 -!!
+App State == GA Southern [App State 4]; App St -9.5
+TCU > LA Tech (4) [11.5]; TCU -21.5
+Florida > LSU (5) [18]; Florida -23.5
+Ok St == Baylor [Ok St 3.5]; OK St -5
+Auburn > Miss St (4) [8]; Auburn -6.5 --~
+USC > UCLA (1) [UCLA 0.5]; USC -2.5
+VA Tech > UVA (1) [3.5]; VA Tech -3
+TAM > Miss (4) [12]; TAM -15.5 +
+CSU > USU (6) [11.5]; CSU -13.5 -~-
+BYU > SDSU (3) [12.5]; BYU -17 +
+Cal == WSU [WSU 2]; Cal -2.5
+Stanford == Oregon St [Oregon St 2.5]; Stanford -3
+Hawaii > UNLV (6) [10.5]; Hawaii -20
+
+#######################################
+
+# Week 15 (12-12)
+
+Marshall > UAB (2) [3]; Marshall -5 -~~
+Buffalo > Ball St (4) [12.5]; Buffalo -13.5 ~-~
+Nebraska > Rutgers (2) [4]; Nebraska -6.5
+Oregon > USC (1) [2.5]; USC -3
+Oklahoma == ISU [ISU 1]; Oklahoma -5.5 --~
+OSU > NW (6) [9.5]; OSU -20
+TAM > Tennessee (8) [15.5]; TAM -14 ---
+Wake > FSU (4) [10]; Wake -6.5 ---
+Utah > WSU (6) [10.5]; Utah -10.5 --~
+AFA > Army (5) [8]; AFA -2.5 ---
+Missouri > Miss St (4) [4]; Missouri -1.5 -~
+CCU > ULL (3) [1.5]; CCU -3
+LSU > Ole Miss (1) [Ole Miss 5.5]; Ole Miss -2.5
+Clemson > ND (2) [ND 0.5]; Clemson -10.5
+Wisconsin > Minnesota (4) [10.5]; Wisconsin -12.5
+SJSU > Boise St (3) [6.5]; Boise St -6.5 -~-
+PSU > Illinois (5) [11.5]; Penn St -15 -~!
+Alabama > Florida (5) [7.5]; Alabama -17.5
+Cinn > Tulsa (5) [13]; Cinn -14.5 -~~
+ASU > OSU (6) [16]; ASU -7 ---
+UCLA > Stanford (6) [13.5]; UCLA -7 ---
+
+#######################################
+
+# Bowls
+
+App St > UNT (5) [13.5]; App St -21
+Tulane > Nevada (1) [1.5]; Tulane -3
+BYU > UCF (4) [12.5]; BYU -6
+GA Southern > LA Tech (7) [7.5]; GA Southern -6.5
+Memphis == FAU [Memphis 1]; Memphis -8.5
+Houston > Hawaii (1) [2.5]; Houston -10.5
+Buffalo > Marhsall (3) [1.5]; Buffalo -5
+GA State > WKU (3) [1];
+ULL > UTSA (4) [5.5];
+CCU > Liberty (4) [3];
+Oklahoma State == Miami FL;
+Texas > Colorado (4) [5];
+OK > Florida (2) [2.5]; OK -4
+Wisconsin > Wake (3) [1]; Wisconsin -9.5
+Tulsa > Miss St (3) [4.5]; Miss St -1
+SJSU > Ball St (4) [4]; SJSU -9.5
+WVU > Army (1) [3]; WVU -7
+Auburn > Northwestern (3) [0];
+Cincinnati > Georgia (4) [2.5];
+Alabama > Notre Dame (5) [1.5];
+Clemson > Ohio State (1) [OSU 0.5];
+Kentucky > NC State (1) [1];
+Iowa State > Oregon (5) [0.5];
+Indiana > Ole Miss (3) [3];
+Texas A&M > North Carolina (3) [0.5];
+
+
+
+
+# 1: +7.5 / +2.5 / -2.5
+#    -14.5 / -7.5 / -3.5
+
+# 2: +6.5 / -1.5 / -4.5
+#    -17.5 / -8.5 / -5.5
+
+# 3: +4.5 / -2.5 / -6.5
+#    -20.5 / -10.5 / -7.5
+
+# 4: +1.5 / -4.5 / -7.5
+#    -21.5 / -13.5 / -8.5
+
+# 5: +1.5 / -6.5 / -10.5
+#    -24.5 / -17.5 / -11.5
+
+# 6: -4.5 / -11.5 / -16.5
+#    -29.5 / -21.5 / -17.5
+
+# 7: -4.5 / -13.5 / -17.5
+#    -31.5 / -23 / -18.5
+
+# 8: -9.5 / -17.5 / -22.5
+#    -37.5 / -28.5 / -23.5
