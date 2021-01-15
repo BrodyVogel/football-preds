@@ -90,39 +90,8 @@ for game in range(len(bowl['Home Team'])):
                     verbose = True, spread_target = [nopq])
     print('\n\n')
 
-evaluate(analysis_ncaa, 'Fresno St', 'New Mexico', size=12)
-print("\n")
-evaluate_v2(analysis_ncaa, 'Fresno St', 'New Mexico', factor_policy = factor_policy,
-                    verbose = True, spread_target = [nopq])
 
-
-# Week 4
-## 11-3
-
-# Week 5
-## 8-6
-
-# Week 6
-## 10-4
-
-
-# Week 9
-##
-# San Francisco > GB (3)
-# Tennessee > Chicago (4)
-# Seattle > Buffalo (4)
-# Houston > Jacksonville (2)
-# Baltimore > Indianapolis (2)
-# Atlanta > Denver (1)
-# Kansas City > Carolina (2)
-# NY Giants > Washington (1)
-# Detroit == Minnesota
-# LA Chargers > Las Vegas (3)
-# Arizona > Miami (2)
-# Pittsburgh > Dallas (5)
-# Tampa Bay > New Orleans (2)
-# New England > NY Jets (2)
-
+######## NFL #################
 week_17 = get_nfl_schedule(17)
 
 for row in range(len(week_17)):
@@ -132,6 +101,8 @@ for row in range(len(week_17)):
         print('\n\n')
     except:
         continue
+
+######### Mess ###########
 
 stat_history = get_historical_nfl_data(start_dates = ['2012-10-10', '2013-10-09', '2014-10-08', '2015-10-07', '2016-10-05', '2017-10-04', '2018-10-03', '2019-10-02'],
                                        start_week = 5,

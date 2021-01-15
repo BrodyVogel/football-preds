@@ -71,6 +71,10 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
+    <state x="327" y="23" key="CommitChangelistDialog2" timestamp="1610753647727">
+      <screen x="0" y="23" width="1440" height="806" />
+    </state>
+    <state x="327" y="23" key="CommitChangelistDialog2/0.23.1440.806@0.23.1440.806" timestamp="1610753647727" />
     <state x="565" y="328" key="Github.ShareDialog" timestamp="1604173590639">
       <screen x="0" y="23" width="1440" height="799" />
     </state>
@@ -79,6 +83,10 @@
       <screen x="0" y="23" width="1440" height="799" />
     </state>
     <state x="221" y="62" key="SettingsEditor/0.23.1440.799@0.23.1440.799" timestamp="1607791893259" />
+    <state x="305" y="145" key="Vcs.Push.Dialog.v2" timestamp="1610753699450">
+      <screen x="0" y="23" width="1440" height="806" />
+    </state>
+    <state x="305" y="145" key="Vcs.Push.Dialog.v2/0.23.1440.806@0.23.1440.806" timestamp="1610753699450" />
     <state width="700" height="379" key="XDebugger.FullValuePopup" timestamp="1606430797307">
       <screen x="0" y="23" width="1440" height="799" />
     </state>
